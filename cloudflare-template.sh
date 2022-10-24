@@ -65,8 +65,15 @@ fi
 ## Get existing IP
 ###########################################
 old_ip=$(echo "$record" | sed -E 's/.*"content":"(([0-9]{1,3}\.){3}[0-9]{1,3})".*/\1/')
+
+# Use regex to check for proper IPv4 format.
+if [[ ! $old_ip =~ ^$ipv4_regex$ ]]; then
+    echo "DDNS Updater: Failed to get old IP." | systemd-cat -p warning
+    exit 2
+fi
+
 # Compare if they're the same
-if [[ $ip == $old_ip ]]; then
+if [[ "$ip" == "$old_ip" ]]; then
   echo "DDNS Updater: IP ($ip) for ${record_name} has not changed." | systemd-cat -p info
   exit 0
 fi
